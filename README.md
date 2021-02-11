@@ -46,7 +46,8 @@ Please refer to https://mballester-minesweeper-api.herokuapp.com/ for full api d
 ## Technologies
  * Spring Boot 2.4.2
  * Postgresql
- * Spring Doc Open API UI
+ * Springdoc-openapi
+ * Junit
  
 ## Usage
 [Heroku - MinesWeeper API](https://mballester-minesweeper-api.herokuapp.com/)
@@ -56,12 +57,14 @@ From here you can test the rest endpoint sending them in json format
 ## Important Notes
 
 API was created using RestController to handle rest api calls.
-Once the request is validated (user's input validation), a service is taking care of calling to the domain objects to accomplish the game's logic, and the game's data persistance.
-Game's data is persisted using a JPA crud repository: 
+Once the request is validated (user's input validation), a service is taking care of calling to the domain objects 
+to accomplish the game's logic. Once the game logic is ready it's persisted using a JPA crud repository:
+ 
 - userName: user's identification
+- board: json that contains user's actions
+- state: game states (ACTICE, VICTORY, LOST)
 - startTime: when the game was started
 - endTime: when the game is finished (only win or loss)
-- board: json that contains user's actions
 
 ## Features implemented
 
@@ -72,14 +75,14 @@ Game's data is persisted using a JPA crud repository:
   - "/playGame" endpoint takes care of game's logic, resulting in 3 possible states for a started game: 
     - ACTIVE: user is still playing
     - LOST: game is over, user lost the game
-    - VICTORY: game is over, user wins the game
+    - VICTORY: game is over, user won the game
     
 - Persistence
     - Each user's action is persisted in a postgresql database
     
 - Time tracking
-    - When the game is started, a new entry is added in the game table to store the game start time
-    - When the game is ended (win or loss), the end date is updated for the user's active game session
+    - When the game is started, a new entry is added in the game table to store the start time
+    - When the game is ended, the end date is updated for the user's active game session
      
 - Ability to start a new game and preserve/resume the old ones
     - Each user can start only 1 game, while the game is still ACTIVE, api will refuse to start a new game

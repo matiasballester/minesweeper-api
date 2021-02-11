@@ -55,6 +55,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
                 logger.debug("User " + gameBoardActionSettings.getUserName() + " selected a mined cell. Game ended");
                 game.setEndTime(LocalDateTime.now());
                 game.setState(States.LOST);
+                gameBoardAction.revealMines();
             } else {
                 gameBoardAction.reveal();
                 gameBoardAction.revealNeighbors();

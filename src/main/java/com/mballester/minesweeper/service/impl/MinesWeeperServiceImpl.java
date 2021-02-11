@@ -32,9 +32,9 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
         Cell[][] board = createCells(gameBoardSettings.getRows(), gameBoardSettings.getCols());
         logger.debug("Board created with dimension - Rows: " + board.length + ", Columns: " + board[0].length);
 
-        GameBoardAction gameBoardAction = new GameBoardAction(gameBoardSettings.getRows(), gameBoardSettings.getCols(), gameBoardSettings.getMines(), board);
-        gameBoardAction.loadMines();
-        gameBoardAction.loadNearMines();
+        GameBoard gameBoard = new GameBoard(gameBoardSettings.getRows(), gameBoardSettings.getCols(), gameBoardSettings.getMines(), board);
+        gameBoard.loadMines();
+        gameBoard.loadNearMines();
 
         Game game = new Game(board, gameBoardSettings.getUserName());
         gameRepository.save(game);
@@ -99,7 +99,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
 
     private Game loadActiveGameByUser(String userName){
         Optional<List<Game>> optionalGame = gameRepository.findByUserNameAndState(userName, States.ACTIVE);
-        if(!optionalGame.isPresent()) {
+        if(optionalGame.get().size() == 0) {
             throw new GameNotActiveException("Game not active for user " + userName);
         }
         return optionalGame.get().get(0);

@@ -61,12 +61,22 @@ public class MinesWeeperController {
         }
     }
 
-    @GetMapping("/get/game")
+    @GetMapping("/get/game/active/")
     public ResponseEntity loadActiveGameByUserName(@RequestParam String userName) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(minesweeperService.getGamesByUserAndStatus(userName, States.ACTIVE));
         } catch (Exception e) {
             logger.error("Failed to load a game by user " + userName);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/get/games/")
+    public ResponseEntity loadGamesByUserName(@RequestParam  String userName) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(minesweeperService.getGamesByUserAndStatus(userName, null));
+        } catch (Exception e) {
+            logger.error("Failed to load games by userName " + userName);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }
@@ -77,16 +87,6 @@ public class MinesWeeperController {
             return ResponseEntity.status(HttpStatus.OK).body(minesweeperService.getGame(id));
         } catch (Exception e) {
             logger.error("Failed to load a game by id " + id);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-        }
-    }
-
-    @GetMapping("/get/games/{userName}")
-    public ResponseEntity loadGamesByUserName(@PathVariable String userName) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(minesweeperService.getGamesByUserAndStatus(userName, null));
-        } catch (Exception e) {
-            logger.error("Failed to load games by userName " + userName);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
         }
     }

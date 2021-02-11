@@ -20,10 +20,4 @@ class MinesweeperApplicationTests {
 		assertThat(minesWeeperService).isNotNull();
 	}
 
-	void testBoardCreatedSuccessfully() {
-		GameBoardSettings gameBoardSettings = new GameBoardSettings("Matias", 2, 2, 1);
-		Game game = minesWeeperService.createGame(gameBoardSettings);
-		Assert.isTrue(game.getBoard().length == 2, "Board successfully created");
-	}
-
 }

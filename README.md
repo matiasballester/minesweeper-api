@@ -31,11 +31,11 @@ This project exposes these rest endpoints:
 * row: row component of the selected cell
 * column: column component of the selected cell
 
-@GetMapping("/get/game")[@RequestParam String userName]: returns a user's active game if exists
+@GetMapping("/get/game/active")[@RequestParam String userName]: returns a user's active game if exists
  
 @GetMapping("/get/game/{id}")[@PathVariable Long id]: returns a game by id
 
-@GetMapping("/get/games/{userName}")[@PathVariable String userName]: returns a list of user's games (any status)
+@GetMapping("/get/games)[@RequestParam String userName]: returns a list of user's games (any status)
 
 @GetMapping("/get/games"): return all the persisted games (any status)
 

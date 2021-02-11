@@ -7,6 +7,8 @@ Project builds a rest api that supports playing the game [GitHub Pages](https://
 * [General info](#general-info)
 * [Technologies](#technologies)
 * [Usage](#usage) 
+* [Important Notes](#important-notes)
+* [Features implemented](#features-implemented)
 
 
 ## General info 
@@ -41,7 +43,7 @@ This project exposes these rest endpoints:
 Please refer to https://mballester-minesweeper-api.herokuapp.com/ for full api documentation
 
 
-##Technologies
+## Technologies
  * Spring Boot 2.4.2
  * Postgresql
  * Spring Doc Open API UI

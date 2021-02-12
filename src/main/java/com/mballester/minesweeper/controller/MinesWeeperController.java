@@ -30,12 +30,6 @@ public class MinesWeeperController {
     @PostMapping("/startGame")
     public ResponseEntity create(@RequestBody GameBoardSettings gameBoardSettings) {
         try {
-            if (gameBoardSettings.getMines() >= gameBoardSettings.getCols() * gameBoardSettings.getRows()) {
-                return ResponseEntity.badRequest().body(new Message("Please use less number of mines"));
-            }
-            if("".equals(gameBoardSettings.getUserName())) {
-                return ResponseEntity.badRequest().body(new Message("Please enter an username"));
-            }
             return ResponseEntity.status(HttpStatus.CREATED).body(minesweeperService.createGame(gameBoardSettings));
         } catch (Exception e) {
             logger.error("Failed to create a new game", e);

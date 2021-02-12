@@ -9,6 +9,7 @@ import com.mballester.minesweeper.service.MinesWeeperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -24,10 +25,12 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
 
     @Override
     public Game createGame(GameBoardSettings gameBoardSettings) {
+        if ("".equals(gameBoardSettings.getUserName())) throw new IllegalArgumentException("User name cannot be empty");
         if (checkGameActive(gameBoardSettings.getUserName())) throw new GameStillActiveException("Game for user " + gameBoardSettings.getUserName() + " is still active");
-        if (gameBoardSettings.getRows() < 0) throw new IllegalArgumentException("Invalid number of rows.");
-        if (gameBoardSettings.getCols() < 0) throw new IllegalArgumentException("Invalid number of columns.");
-        if (gameBoardSettings.getMines() < 1) throw new IllegalArgumentException("Invalid number of mines.");
+        if (gameBoardSettings.getRows() <= 0) throw new IllegalArgumentException("Invalid number of rows");
+        if (gameBoardSettings.getCols() <= 0) throw new IllegalArgumentException("Invalid number of columns");
+        if (gameBoardSettings.getMines() < 1) throw new IllegalArgumentException("Invalid number of mines");
+        if (gameBoardSettings.getMines() >= gameBoardSettings.getCols() * gameBoardSettings.getRows()) throw new IllegalArgumentException("Please use less number of mines");
 
         Cell[][] board = createCells(gameBoardSettings.getRows(), gameBoardSettings.getCols());
         logger.debug("Board created with dimension - Rows: " + board.length + ", Columns: " + board[0].length);

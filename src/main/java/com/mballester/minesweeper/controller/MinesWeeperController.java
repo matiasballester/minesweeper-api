@@ -67,8 +67,8 @@ public class MinesWeeperController {
         }
     }
 
-    @GetMapping("/games/{userName}")
-    public ResponseEntity loadGamesByUserName(@PathVariable  String userName) {
+    @GetMapping("/games/user/{userName}")
+    public ResponseEntity loadGamesByUserName(@PathVariable String userName) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(minesweeperService.getGamesByUserAndStatus(userName, null));
         } catch (Exception e) {

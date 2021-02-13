@@ -9,7 +9,7 @@ import com.mballester.minesweeper.service.MinesWeeperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
@@ -86,7 +86,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     @Override
     public List<Game> getGamesByUserAndStatus(String userName, States state) {
         if(state == null)
-            return gameRepository.findByUserName(userName).orElse(Collections.EMPTY_LIST);
+            return gameRepository.findByUserName(userName, Sort.by(Sort.Direction.DESC, "startTime")).orElse(Collections.EMPTY_LIST);
         else
             return gameRepository.findByUserNameAndState(userName, state).orElse(Collections.EMPTY_LIST);
     }

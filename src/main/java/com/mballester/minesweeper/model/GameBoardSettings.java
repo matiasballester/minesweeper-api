@@ -5,11 +5,19 @@ public class GameBoardSettings {
     private int rows;
     private int cols;
     private int mines;
+    private long userId;
 
     public GameBoardSettings() {}
 
     public GameBoardSettings(String userName, int rows, int cols, int mines) {
         this.userName = userName;
+        this.rows = rows;
+        this.cols = cols;
+        this.mines = mines;
+    }
+
+    public GameBoardSettings(Long userId, int rows, int cols, int mines) {
+        this.userId = userId;
         this.rows = rows;
         this.cols = cols;
         this.mines = mines;
@@ -45,5 +53,13 @@ public class GameBoardSettings {
 
     public void setMines(int mines) {
         this.mines = mines;
+    }
+
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 }

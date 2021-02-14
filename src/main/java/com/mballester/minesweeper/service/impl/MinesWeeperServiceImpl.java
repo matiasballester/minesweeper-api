@@ -1,19 +1,23 @@
 package com.mballester.minesweeper.service.impl;
 
-import com.mballester.minesweeper.exceptions.GameNotActiveException;
 import com.mballester.minesweeper.exceptions.GameNotFoundException;
-import com.mballester.minesweeper.exceptions.GameStillActiveException;
+import com.mballester.minesweeper.exceptions.UserAlreadyExistsException;
+import com.mballester.minesweeper.exceptions.UserNotFoundException;
 import com.mballester.minesweeper.model.*;
 import com.mballester.minesweeper.repository.GameRepository;
+import com.mballester.minesweeper.repository.UserRepository;
 import com.mballester.minesweeper.service.MinesWeeperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 public class MinesWeeperServiceImpl implements MinesWeeperService {
@@ -23,10 +27,20 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     @Autowired
     private GameRepository gameRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
     @Override
     public Game createGame(GameBoardSettings gameBoardSettings) {
-        if ("".equals(gameBoardSettings.getUserName())) throw new IllegalArgumentException("User name cannot be empty");
-        if (checkGameActive(gameBoardSettings.getUserName())) throw new GameStillActiveException("Game for user " + gameBoardSettings.getUserName() + " is still active");
+        User user = userRepository.findById(gameBoardSettings.getUserId()).orElseThrow(() -> new IllegalArgumentException("Invalid user"));
         if (gameBoardSettings.getRows() <= 0) throw new IllegalArgumentException("Invalid number of rows");
         if (gameBoardSettings.getCols() <= 0) throw new IllegalArgumentException("Invalid number of columns");
         if (gameBoardSettings.getMines() < 1) throw new IllegalArgumentException("Invalid number of mines");
@@ -39,23 +53,23 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
         gameBoard.loadMines();
         gameBoard.loadNearMines();
 
-        Game game = new Game(board, gameBoardSettings.getUserName());
+        Game game = new Game(board, user);
         gameRepository.save(game);
-        logger.debug("Game ID " + game.getId() + " for user: " + game.getUserName() + " successfully created");
+        logger.debug("Game Id" + game.getId() + " for user " + user.getUserName() + " was successfully created");
 
         return game;
     }
 
     @Override
     public Game playGame(GameBoardActionSettings gameBoardActionSettings) {
-        Game game = loadActiveGameByUser(gameBoardActionSettings.getUserName());
-        GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionSettings.getRow(), gameBoardActionSettings.getColumn(), game.getBoard());
+        Game game = gameRepository.findById(gameBoardActionSettings.getGameId()).orElseThrow(() -> new GameNotFoundException());
 
-        logger.debug("User " + gameBoardActionSettings.getUserName() + " selects cell [" + gameBoardActionSettings.getRow() + "][" + gameBoardActionSettings.getColumn() + "]");
+        GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionSettings.getRow(), gameBoardActionSettings.getColumn(), game.getBoard());
+        logger.debug("User " + game.getUser().getUserName() + " selects cell [" + gameBoardActionSettings.getRow() + "][" + gameBoardActionSettings.getColumn() + "]");
 
         if(! gameBoardAction.isFlagged()) {
             if (gameBoardAction.isMined()) {
-                logger.debug("User " + gameBoardActionSettings.getUserName() + " selected a mined cell. Game ended");
+                logger.debug("User " + game.getUser().getUserName() + " selected a mined cell. Game ended");
                 game.setEndTime(LocalDateTime.now());
                 game.setState(States.LOST);
                 gameBoardAction.revealMines();
@@ -63,7 +77,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
                 gameBoardAction.reveal();
                 gameBoardAction.revealNeighbors();
                 if (gameBoardAction.checkWin()) {
-                    logger.debug("User " + gameBoardActionSettings.getUserName() + " win");
+                    logger.debug("User " + game.getUser().getUserName() + " win");
                     game.setEndTime(LocalDateTime.now());
                     game.setState(States.VICTORY);
                     gameBoardAction.revealMines();
@@ -76,7 +90,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
 
     @Override
     public Game flagCell(GameBoardActionSettings gameBoardActionSettings) {
-        Game game = loadActiveGameByUser(gameBoardActionSettings.getUserName());
+        Game game = gameRepository.findById(gameBoardActionSettings.getGameId()).orElseThrow(() -> new GameNotFoundException());
         GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionSettings.getRow(), gameBoardActionSettings.getColumn(), game.getBoard());
         gameBoardAction.flagCell();
         gameRepository.save(game);
@@ -84,11 +98,12 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     }
 
     @Override
-    public List<Game> getGamesByUserAndStatus(String userName, States state) {
+    public List<Game> getGamesByUserAndStatus(Long userId, States state) {
+        User user = userRepository.findById(userId).get();
         if(state == null)
-            return gameRepository.findByUserName(userName, Sort.by(Sort.Direction.DESC, "startTime")).orElse(Collections.EMPTY_LIST);
+            return user.getGames().stream().sorted(Comparator.comparing(Game::getStartTime).reversed()).collect(Collectors.toList());
         else
-            return gameRepository.findByUserNameAndState(userName, state).orElse(Collections.EMPTY_LIST);
+            return user.getGames().stream().filter(game -> game.getState() == state).collect(Collectors.toList());
     }
 
     @Override
@@ -101,17 +116,31 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
         return gameRepository.findById(id).orElseThrow(() -> new GameNotFoundException("Game ID : " + id + " cannot be found"));
     }
 
-    private Game loadActiveGameByUser(String userName){
-        Optional<List<Game>> optionalGame = gameRepository.findByUserNameAndState(userName, States.ACTIVE);
-        if(optionalGame.get().size() == 0) {
-            throw new GameNotActiveException("Game not active for user " + userName);
-        }
-        return optionalGame.get().get(0);
+    @Override
+    public User createUser(UserRequest userRequest) {
+        if("".equals(userRequest.getUserName())) throw new IllegalArgumentException("Username cannot be blank");
+        if("".equals(userRequest.getPassword())) throw new IllegalArgumentException("Password cannot be blank");
+
+        if(userRepository.findByUserName(userRequest.getUserName()) != null) throw new UserAlreadyExistsException();
+        User user = new User(userRequest.getUserName(), passwordEncoder.encode(userRequest.getPassword()));
+        userRepository.save(user);
+        return user;
     }
 
-    private boolean checkGameActive(String userName) {
-        List<Game> games = gameRepository.findByUserNameAndState(userName, States.ACTIVE).get();
-        return games.size() > 0;
+    @Override
+    public User getAuthenticatedUser(UserRequest userRequest) {
+        if("".equals(userRequest.getUserName())) throw new IllegalArgumentException("Username cannot be blank");
+        if("".equals(userRequest.getPassword())) throw new IllegalArgumentException("Password cannot be blank");
+
+        User user = userRepository.findByUserName(userRequest.getUserName());
+        if(user == null) throw new IllegalArgumentException("User not registered");
+        if(! passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) throw new IllegalArgumentException("Username and/or password are not correct");
+        return user;
+    }
+
+    @Override
+    public User getUser(Long id) {
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User doesn't exists"));
     }
 
     private Cell[][] createCells(int rows, int cols) {

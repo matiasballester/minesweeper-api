@@ -1,13 +1,16 @@
 package com.mballester.minesweeper;
 
-import com.mballester.minesweeper.exceptions.GameStillActiveException;
+import com.mballester.minesweeper.exceptions.UserAlreadyExistsException;
 import com.mballester.minesweeper.model.Cell;
 import com.mballester.minesweeper.model.Game;
 import com.mballester.minesweeper.model.GameBoard;
 import com.mballester.minesweeper.model.GameBoardActionSettings;
 import com.mballester.minesweeper.model.GameBoardSettings;
 import com.mballester.minesweeper.model.States;
+import com.mballester.minesweeper.model.User;
+import com.mballester.minesweeper.model.UserRequest;
 import com.mballester.minesweeper.repository.GameRepository;
+import com.mballester.minesweeper.repository.UserRepository;
 import com.mballester.minesweeper.service.impl.MinesWeeperServiceImpl;
 import org.junit.Before;
 import org.junit.runner.RunWith;
@@ -28,20 +31,23 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class MinesWeeperServiceTest {
 
     @Autowired
-    MinesWeeperServiceImpl minesWeeperService;
+    private MinesWeeperServiceImpl minesWeeperService;
 
     @MockBean
     private GameRepository gameRepository;
 
-    Game game;
-    String userName;
-    Optional<List<Game>> listOptional;
+    @MockBean
+    private UserRepository userRepository;
+
+    private Game game;
+    private User user;
+    private Optional<List<Game>> listOptional;
 
     @Before
     public void init() {
         Cell[][] board = createCells(2, 2);
-        userName = "Matias";
-        game = new Game(board, userName);
+        user = new User("Matias", "Matias");
+        game = new Game(board, user);
 
         List<Game> userGames = new ArrayList<>(1);
         userGames.add(game);
@@ -53,34 +59,34 @@ public class MinesWeeperServiceTest {
     public void testStartGameSuccessfully() {
         listOptional = Optional.of(new ArrayList<>());
         when(gameRepository.save(game)).thenReturn(game);
-        when(gameRepository.findByUserNameAndState(userName, States.ACTIVE)).thenReturn(listOptional);
+        when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
 
-        Game newGame = minesWeeperService.createGame(new GameBoardSettings(userName, 2, 2, 3 ));
+        Game newGame = minesWeeperService.createGame(new GameBoardSettings(user.getId(), 2, 2, 3 ));
 
-        assertThat(newGame.getUserName()).isEqualTo(userName);
-        assertThat(newGame.getState()).isEqualByComparingTo(States.ACTIVE);
+        assertThat(newGame.getUser().getUserName()).isEqualTo("Matias");
+        assertThat(newGame.getState()).isEqualTo(States.ACTIVE);
         assertThat(newGame.getBoard().length).isEqualTo(2);
         assertThat(newGame.getBoard()[0].length).isEqualTo(2);
     }
 
-    @org.junit.Test(expected = GameStillActiveException.class)
-    public void testGameStillActive() {
-        when(gameRepository.findByUserNameAndState(userName, States.ACTIVE)).thenReturn(listOptional);
-        minesWeeperService.createGame(new GameBoardSettings(userName, 2, 2, 3 ));
+    @org.junit.Test(expected = UserAlreadyExistsException.class)
+    public void testUserNotFound() {
+        when(userRepository.findByUserName("Matias")).thenReturn(user);
+        minesWeeperService.createUser(new UserRequest("Matias", "matias"));
     }
 
     @org.junit.Test
-    public void testUsersLoss() {
+    public void testLost() {
+        when(gameRepository.findById(0l)).thenReturn(Optional.of(game));
         GameBoard gameBoard = new GameBoard(2, 2, 3, game.getBoard());
         gameBoard.loadMines();
         gameBoard.loadNearMines();
 
         List<Game> userGames = new ArrayList<>(1);
         userGames.add(game);
-        when(gameRepository.findByUserNameAndState(userName, States.ACTIVE)).thenReturn(Optional.of(userGames));
 
         Cell minedCell = getMinedCell(game.getBoard());
-        Game returnedGame = minesWeeperService.playGame(new GameBoardActionSettings(userName, minedCell.getRow(), minedCell.getCol()));
+        Game returnedGame = minesWeeperService.playGame(new GameBoardActionSettings(game.getId(), minedCell.getRow(), minedCell.getCol()));
 
         assertThat(returnedGame.getState()).isEqualByComparingTo(States.LOST);
     }

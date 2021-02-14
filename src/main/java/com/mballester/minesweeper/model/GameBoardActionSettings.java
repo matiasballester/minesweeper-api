@@ -2,6 +2,7 @@ package com.mballester.minesweeper.model;
 
 public class GameBoardActionSettings {
     private String userName;
+    private long gameId;
     private int row;
     private int column;
 
@@ -11,6 +12,16 @@ public class GameBoardActionSettings {
         this.userName = userName;
         this.row = row;
         this.column = column;
+    }
+
+    public GameBoardActionSettings(Long gameId, int row, int column) {
+        this.gameId = gameId;
+        this.row = row;
+        this.column = column;
+    }
+
+    public GameBoardActionSettings(long gameId) {
+        this.gameId = gameId;
     }
 
     public String getUserName() {
@@ -35,5 +46,13 @@ public class GameBoardActionSettings {
 
     public void setColumn(int column) {
         this.column = column;
+    }
+
+    public long getGameId() {
+        return gameId;
+    }
+
+    public void setGameId(long gameId) {
+        this.gameId = gameId;
     }
 }

@@ -20,8 +20,9 @@ public class Game {
     )
     private long id;
 
-    @Column(name = "user_name")
-    private String userName;
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    private User user;
 
     @Enumerated(EnumType.STRING)
     private States state;
@@ -38,9 +39,10 @@ public class Game {
 
     public Game() {}
 
-    public Game(Cell[][] board, String userName) {
+    public Game(Cell[][] board, User user) {
         this.board = board;
-        this.userName = userName;
+        this.user = user;
+        //this.userName = userName;
         this.state = States.ACTIVE;
         this.startTime = LocalDateTime.now();
     }
@@ -53,13 +55,13 @@ public class Game {
         this.id = id;
     }
 
-    public String getUserName() {
+    /*public String getUserName() {
         return userName;
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
+    }*/
 
     public States getState() {
         return state;
@@ -95,5 +97,13 @@ public class Game {
 
     public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

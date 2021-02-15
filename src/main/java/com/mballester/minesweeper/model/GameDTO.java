@@ -14,6 +14,9 @@ public class GameDTO implements Serializable {
     private String endTime;
     private String status;
     private String timeSpent;
+    private Integer rows;
+    private Integer cols;
+    private Integer mines;
 
     private static final DateTimeFormatter YYYYMMDD_HHMMSS = DateTimeFormatter.ofPattern("MM/dd/yyyy 'at' HH:mm:ss");
 
@@ -93,11 +96,38 @@ public class GameDTO implements Serializable {
         this.timeSpent = timeSpent;
     }
 
+    public Integer getRows() {
+        return rows;
+    }
+
+    public void setRows(Integer rows) {
+        this.rows = rows;
+    }
+
+    public Integer getCols() {
+        return cols;
+    }
+
+    public void setCols(Integer cols) {
+        this.cols = cols;
+    }
+
+    public Integer getMines() {
+        return mines;
+    }
+
+    public void setMines(Integer mines) {
+        this.mines = mines;
+    }
+
     public static GameDTO createGameDTO(Game game) {
         GameDTO gameDTO = new GameDTO();
         gameDTO.setUserId(game.getUser().getId());
         gameDTO.setGameId(game.getId());
         gameDTO.setBoard(game.getBoard());
+        gameDTO.setCols(game.getCols());
+        gameDTO.setRows(game.getRows());
+        gameDTO.setMines(game.getMines());
         gameDTO.setActive(game.getState() == States.ACTIVE);
         gameDTO.setUserWon(game.getState() == States.VICTORY);
         gameDTO.setStatus(game.getState().name());

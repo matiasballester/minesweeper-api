@@ -5,7 +5,7 @@ import javax.validation.constraints.Size;
 
 public class UserInputRequest {
     @NotBlank(message = "Name cannot be empty")
-    @Size(min=3, message="Name should have at least 3 characters")
+    @Size(min=3, max=50, message="Name should have at least 3 characters")
     private String userName;
 
     @NotBlank(message = "Password cannot be empty")

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,6 +35,14 @@ public class MinesWeeperController {
     @Autowired
     private MinesWeeperService minesweeperService;
 
+    /**
+     * Register a new user
+     *
+     * @param userInputRequest {
+     *     userName, password
+     * }
+     * @return created user
+     */
     @PostMapping("/createUser")
     public ResponseEntity createUser(@Valid @RequestBody UserInputRequest userInputRequest) {
         try {
@@ -44,36 +53,13 @@ public class MinesWeeperController {
         }
     }
 
-    @PostMapping("/startGame")
-    public ResponseEntity create(@Valid @RequestBody GameBoardInput gameBoardSettings) {
-        try {
-            return ResponseEntity.status(HttpStatus.CREATED).body(GameDTO.createGameDTO(minesweeperService.createGame(gameBoardSettings)));
-        } catch (Exception e) {
-            logger.error("Failed to create a new game", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
-        }
-    }
-
-    @PostMapping("/playGame")
-    public ResponseEntity play(@Valid @RequestBody GameBoardActionInput gameBoardActionInput) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(GameDTO.createGameDTO(minesweeperService.playGame(gameBoardActionInput)));
-        } catch (Exception e) {
-            logger.error("Failed to make a move", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
-        }
-    }
-
-    @PostMapping("/addFlag")
-    public ResponseEntity flag(@Valid @RequestBody GameBoardActionInput gameBoardActionInput) {
-        try {
-            return ResponseEntity.status(HttpStatus.OK).body(GameDTO.createGameDTO(minesweeperService.flagCell(gameBoardActionInput)));
-        } catch (Exception e) {
-            logger.error("Failed to make a move", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
-        }
-    }
-
+    /**
+     * Authenticates an already existing user
+     * @param userInputRequest {
+     *      userName, password
+     * }
+     * @return DTO that contains the user id
+     */
     @PostMapping("/authenticateUser")
     public ResponseEntity authenticateUser(@Valid @RequestBody UserInputRequest userInputRequest) {
         try {
@@ -84,8 +70,13 @@ public class MinesWeeperController {
         }
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity loadUser(@PathVariable Long id) {
+    /**
+     * Returns an user by user id
+     * @param id
+     * @return user
+     */
+    @GetMapping("/users/{id}")
+    public ResponseEntity loadUser(@PathVariable @NotNull Long id) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(minesweeperService.getUser(id));
         } catch (Exception e) {
@@ -94,8 +85,64 @@ public class MinesWeeperController {
         }
     }
 
-    @GetMapping("/games/user/{id}")
-    public ResponseEntity loadGamesByUserId(@PathVariable Long id) {
+    /**
+     * Creates a board using a specific board configuration (#rows, #columns, #mines)
+     * @param gameBoardInput {
+     *    userId, rows, columns, mines
+     * }
+     * @return a DTO that contains the created game
+     */
+    @PostMapping("/startGame")
+    public ResponseEntity create(@Valid @RequestBody GameBoardInput gameBoardInput) {
+        try {
+            return ResponseEntity.status(HttpStatus.CREATED).body(GameDTO.createGameDTO(minesweeperService.createGame(gameBoardInput)));
+        } catch (Exception e) {
+            logger.error("Failed to create a new game", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
+        }
+    }
+
+    /**
+     * Process the game logic
+     * @param gameBoardActionInput {
+     *      gameId, rowIndex, columnIndex
+     * }
+     * @return a DTO that contains the game with the updates
+     */
+    @PostMapping("/playGame")
+    public ResponseEntity play(@Valid @RequestBody GameBoardActionInput gameBoardActionInput) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(GameDTO.createGameDTO(minesweeperService.playGame(gameBoardActionInput)));
+        } catch (Exception e) {
+            logger.error("Failed to make a move", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
+        }
+    }
+
+    /**
+     * Adds a flag
+     * @param gameBoardActionInput {
+     *     gameId, rowIndex, columnIndex
+     * }
+     * @return a DTO that contains the game with the updates
+     */
+    @PostMapping("/addFlag")
+    public ResponseEntity flag(@Valid @RequestBody GameBoardActionInput gameBoardActionInput) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(GameDTO.createGameDTO(minesweeperService.flagCell(gameBoardActionInput)));
+        } catch (Exception e) {
+            logger.error("Failed to make a move", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
+        }
+    }
+
+    /**
+     * Returns the user's games
+     * @param id
+     * @return GameDTO list
+     */
+    @GetMapping("/games/users/{id}")
+    public ResponseEntity loadGamesByUserId(@PathVariable @NotNull Long id) {
         try {
             final List<GameDTO> gamesDTO = new ArrayList<>();
             minesweeperService.getGamesByUserAndStatus(id, null).forEach(game -> {
@@ -108,8 +155,13 @@ public class MinesWeeperController {
         }
     }
 
-    @GetMapping("/game/{id}")
-    public ResponseEntity loadGameById(@PathVariable Long id) {
+    /**
+     * Returns a game by id
+     * @param id
+     * @return a DTO that contains an existing the game
+     */
+    @GetMapping("/games/{id}")
+    public ResponseEntity loadGameById(@PathVariable @NotNull Long id) {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(GameDTO.createGameDTO(minesweeperService.getGame(id)));
         } catch (Exception e) {
@@ -118,6 +170,10 @@ public class MinesWeeperController {
         }
     }
 
+    /**
+     * Returns all the existing games
+     * @return GameDTO list
+     */
     @GetMapping("/games")
     public ResponseEntity loadGames() {
         try {

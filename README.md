@@ -14,34 +14,39 @@ This project exposes a RESTful API for the game Minesweeper [GitHub Pages](https
 ## General info 
 This project exposes these rest endpoints:
 
-@PostMapping("/startGame)[@RequestBody GameBoardSettings]: retrieves the game's configuration selected by the user
+@PostMapping("/createUser")[@RequestBody UserInputRequest]: retrieves the user register request
+* userName: user's nickname
+* password: user's password
+
+@PostMapping("/authenticateUser")[@RequestBody UserInputRequest]: authenticate an user
+* userName: user's nickname
+* password: user's password
+
+@GetMapping("/users/{id}"): returns the user by id
+
+@PostMapping("/startGame)[@RequestBody GameBoardInputRequest]: retrieves the game's configuration selected by the user
 * userName: user's identification
 * rows: amount of rows used to create the board
 * columns: amount of columns used to create the board
 * mines: amount of mines to be loaded in the board
 
-
-@PostMapping("/playGame)[@RequestBody GameBoardActionSettings]: user can start playing the game by selecting or flagging a cell
+@PostMapping("/playGame)[@RequestBody GameBoardActionInputRequest]: user can start playing the game by selecting or flagging a cell
 * userName: user's identification
 * row: row component of the selected cell
 * column: column component of the selected cell
 
-@PostMapping("/addFlag)[@RequestBody GameBoardActionSettings]: user can flag a cell to think it twice. As a result of it the cell will be marked as flagged
+@PostMapping("/addFlag)[@RequestBody GameBoardActionInputRequest]: user can flag a cell to think it twice. As a result of it the cell will be marked as flagged
 * userName: user's identification
 * row: row component of the selected cell
 * column: column component of the selected cell
 
-@GetMapping("/game/active")[@PathVariable String userName]: returns a user's active game if exists
- 
-@GetMapping("/game/{id}")[@PathVariable Long id]: returns a game by id
+@GetMapping("/games/users/{id}")[@PathVariable Long id]: returns user's games by user id
 
-@GetMapping("/games/{userName})[@PathVariable String userName]: returns a list of user's games (any status)
+@GetMapping("/games/{id}")[@PathVariable Long id]: returns a game by id
 
 @GetMapping("/games"): return all the persisted games
 
-
 Please refer to https://mballester-minesweeper-api.herokuapp.com/ for full api documentation
-
 
 ## Technologies
  * Spring Boot 2.4.2

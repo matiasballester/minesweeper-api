@@ -15,7 +15,7 @@ public class GameDTO implements Serializable {
     private String status;
     private String timeSpent;
 
-    private static final DateTimeFormatter YYYYMMDD_HHMMSS = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+    private static final DateTimeFormatter YYYYMMDD_HHMMSS = DateTimeFormatter.ofPattern("MM/dd/yyyy 'at' HH:mm:ss");
 
     public GameDTO(){
 

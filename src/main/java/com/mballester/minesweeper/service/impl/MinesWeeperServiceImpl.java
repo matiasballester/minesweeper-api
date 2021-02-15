@@ -119,7 +119,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     @Override
     public User getAuthenticatedUser(UserInputRequest userInputRequest) {
         User user = userRepository.findByUserName(userInputRequest.getUserName());
-        if(user == null) throw new UserNotFoundException("User not registered");
+        if(user == null) throw new UserNotFoundException("User doesn't exists. Please register first");
         if(! passwordEncoder.matches(userInputRequest.getPassword(), user.getPassword())) throw new IllegalArgumentException("Username and/or password are not correct");
         return user;
     }

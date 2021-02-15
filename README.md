@@ -90,15 +90,16 @@ to accomplish the game's logic. Once the game logic is ready it's persisted usin
     - When the game is ended, the end date is updated for the user's active game session
      
 - Ability to start a new game and preserve/resume the old ones
-    - Each user can start only 1 game, while the game is still ACTIVE, api will refuse to start a new game
-    - User needs to complete the game before start a new one
+    - A logged user is able to see all his games, and resume the active ones
     - Each game is persisted in a postgresql database 
     
 - Ability to select the game parameters: number of rows, columns, and mines
     - "/startGame" endpoint allows to the user to configure the number of rows, columns and mines desired for each new game
     
-- Ability to support multiple users/accounts (Not fully implemented)
-    - "/startGame" and "/playGame" supports a userName input. Other user's under a different name can start a new game.
+- Ability to support multiple users/accounts
+    - "/createUser" endpoint handle the user registration
+    - "/authenticateUser" endpoint handle the user authentication
+    - "/startGame" and "/playGame" will use the user logged id
     
 
 

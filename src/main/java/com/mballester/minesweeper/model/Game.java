@@ -5,6 +5,7 @@ import org.hibernate.annotations.Type;
 import org.hibernate.annotations.TypeDef;
 
 import javax.persistence.*;
+import javax.persistence.criteria.CriteriaBuilder;
 import java.time.LocalDateTime;
 
 @Entity(name = "Game")
@@ -37,12 +38,20 @@ public class Game {
     @Column(name = "end_time", columnDefinition = "TIMESTAMP")
     private LocalDateTime endTime;
 
+    @Column(name = "rows")
+    private Integer rows;
+
+    @Column(name = "cols")
+    private Integer cols;
+
+    @Column(name = "mines")
+    private Integer mines;
+
     public Game() {}
 
     public Game(Cell[][] board, User user) {
         this.board = board;
         this.user = user;
-        //this.userName = userName;
         this.state = States.ACTIVE;
         this.startTime = LocalDateTime.now();
     }
@@ -97,5 +106,29 @@ public class Game {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Integer getRows() {
+        return rows;
+    }
+
+    public void setRows(Integer rows) {
+        this.rows = rows;
+    }
+
+    public Integer getCols() {
+        return cols;
+    }
+
+    public void setCols(Integer cols) {
+        this.cols = cols;
+    }
+
+    public Integer getMines() {
+        return mines;
+    }
+
+    public void setMines(Integer mines) {
+        this.mines = mines;
     }
 }

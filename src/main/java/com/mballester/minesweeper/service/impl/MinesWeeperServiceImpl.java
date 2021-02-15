@@ -34,18 +34,22 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Game createGame(GameBoardInput gameBoardSettings) {
-        User user = userRepository.findById(gameBoardSettings.getUserId()).orElseThrow(() -> new IllegalArgumentException("Invalid user"));
-        if (gameBoardSettings.getMines() >= gameBoardSettings.getCols() * gameBoardSettings.getRows()) throw new IllegalArgumentException("Please use less number of mines");
+    public Game createGame(GameBoardInput gameBoardInput) {
+        User user = userRepository.findById(gameBoardInput.getUserId()).orElseThrow(() -> new IllegalArgumentException("Invalid user"));
+        if (gameBoardInput.getMines() >= gameBoardInput.getCols() * gameBoardInput.getRows()) throw new IllegalArgumentException("Please use less number of mines");
 
-        Cell[][] board = createCells(gameBoardSettings.getRows(), gameBoardSettings.getCols());
+        Cell[][] board = createCells(gameBoardInput.getRows(), gameBoardInput.getCols());
         logger.debug("Board created with dimension - Rows: " + board.length + ", Columns: " + board[0].length);
 
-        GameBoard gameBoard = new GameBoard(gameBoardSettings.getRows(), gameBoardSettings.getCols(), gameBoardSettings.getMines(), board);
+        GameBoard gameBoard = new GameBoard(gameBoardInput.getRows(), gameBoardInput.getCols(), gameBoardInput.getMines(), board);
         gameBoard.loadMines();
         gameBoard.loadNearMines();
 
         Game game = new Game(board, user);
+        game.setRows(gameBoardInput.getRows());
+        game.setCols(gameBoardInput.getCols());
+        game.setMines(gameBoardInput.getMines());
+
         gameRepository.save(game);
         logger.debug("Game Id" + game.getId() + " for user " + user.getUserName() + " was successfully created");
 

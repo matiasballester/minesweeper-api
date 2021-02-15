@@ -10,8 +10,7 @@ import com.mballester.minesweeper.service.MinesWeeperService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
@@ -104,7 +103,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
 
     @Override
     public List<Game> getAllGames() {
-        return gameRepository.findAll();
+        return gameRepository.findAll(Sort.by(Sort.Direction.DESC, "endTime"));
     }
 
     @Override

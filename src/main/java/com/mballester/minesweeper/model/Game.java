@@ -55,14 +55,6 @@ public class Game {
         this.id = id;
     }
 
-    /*public String getUserName() {
-        return userName;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }*/
-
     public States getState() {
         return state;
     }

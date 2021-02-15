@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
-public class RedirectHomeController {
+public class RedirectHomeRestController {
 
     @Value("${springdoc.swagger-ui.path:swagger-ui.html}")
     private String apiDoc;

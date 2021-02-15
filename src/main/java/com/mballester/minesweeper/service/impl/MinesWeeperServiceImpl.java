@@ -33,17 +33,9 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
     @Override
-    public Game createGame(GameBoardSettings gameBoardSettings) {
+    public Game createGame(GameBoardInput gameBoardSettings) {
         User user = userRepository.findById(gameBoardSettings.getUserId()).orElseThrow(() -> new IllegalArgumentException("Invalid user"));
-        if (gameBoardSettings.getRows() <= 0) throw new IllegalArgumentException("Invalid number of rows");
-        if (gameBoardSettings.getCols() <= 0) throw new IllegalArgumentException("Invalid number of columns");
-        if (gameBoardSettings.getMines() < 1) throw new IllegalArgumentException("Invalid number of mines");
         if (gameBoardSettings.getMines() >= gameBoardSettings.getCols() * gameBoardSettings.getRows()) throw new IllegalArgumentException("Please use less number of mines");
 
         Cell[][] board = createCells(gameBoardSettings.getRows(), gameBoardSettings.getCols());
@@ -61,11 +53,11 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     }
 
     @Override
-    public Game playGame(GameBoardActionSettings gameBoardActionSettings) {
-        Game game = gameRepository.findById(gameBoardActionSettings.getGameId()).orElseThrow(() -> new GameNotFoundException());
+    public Game playGame(GameBoardActionInput gameBoardActionInput) {
+        Game game = gameRepository.findById(gameBoardActionInput.getGameId()).orElseThrow(() -> new GameNotFoundException());
 
-        GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionSettings.getRow(), gameBoardActionSettings.getColumn(), game.getBoard());
-        logger.debug("User " + game.getUser().getUserName() + " selects cell [" + gameBoardActionSettings.getRow() + "][" + gameBoardActionSettings.getColumn() + "]");
+        GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionInput.getRow(), gameBoardActionInput.getColumn(), game.getBoard());
+        logger.debug("User " + game.getUser().getUserName() + " selects cell [" + gameBoardActionInput.getRow() + "][" + gameBoardActionInput.getColumn() + "]");
 
         if(! gameBoardAction.isFlagged()) {
             if (gameBoardAction.isMined()) {
@@ -89,9 +81,9 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     }
 
     @Override
-    public Game flagCell(GameBoardActionSettings gameBoardActionSettings) {
-        Game game = gameRepository.findById(gameBoardActionSettings.getGameId()).orElseThrow(() -> new GameNotFoundException());
-        GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionSettings.getRow(), gameBoardActionSettings.getColumn(), game.getBoard());
+    public Game flagCell(GameBoardActionInput gameBoardActionInput) {
+        Game game = gameRepository.findById(gameBoardActionInput.getGameId()).orElseThrow(() -> new GameNotFoundException());
+        GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionInput.getRow(), gameBoardActionInput.getColumn(), game.getBoard());
         gameBoardAction.flagCell();
         gameRepository.save(game);
         return game;
@@ -117,24 +109,18 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     }
 
     @Override
-    public User createUser(UserRequest userRequest) {
-        if("".equals(userRequest.getUserName())) throw new IllegalArgumentException("Username cannot be blank");
-        if("".equals(userRequest.getPassword())) throw new IllegalArgumentException("Password cannot be blank");
-
-        if(userRepository.findByUserName(userRequest.getUserName()) != null) throw new UserAlreadyExistsException();
-        User user = new User(userRequest.getUserName(), passwordEncoder.encode(userRequest.getPassword()));
+    public User createUser(UserInputRequest userInputRequest) {
+        if(userRepository.findByUserName(userInputRequest.getUserName()) != null) throw new UserAlreadyExistsException();
+        User user = new User(userInputRequest.getUserName(), passwordEncoder.encode(userInputRequest.getPassword()));
         userRepository.save(user);
         return user;
     }
 
     @Override
-    public User getAuthenticatedUser(UserRequest userRequest) {
-        if("".equals(userRequest.getUserName())) throw new IllegalArgumentException("Username cannot be blank");
-        if("".equals(userRequest.getPassword())) throw new IllegalArgumentException("Password cannot be blank");
-
-        User user = userRepository.findByUserName(userRequest.getUserName());
-        if(user == null) throw new IllegalArgumentException("User not registered");
-        if(! passwordEncoder.matches(userRequest.getPassword(), user.getPassword())) throw new IllegalArgumentException("Username and/or password are not correct");
+    public User getAuthenticatedUser(UserInputRequest userInputRequest) {
+        User user = userRepository.findByUserName(userInputRequest.getUserName());
+        if(user == null) throw new UserNotFoundException("User not registered");
+        if(! passwordEncoder.matches(userInputRequest.getPassword(), user.getPassword())) throw new IllegalArgumentException("Username and/or password are not correct");
         return user;
     }
 

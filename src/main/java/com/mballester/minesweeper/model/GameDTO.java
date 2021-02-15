@@ -2,8 +2,6 @@ package com.mballester.minesweeper.model;
 
 import java.io.Serializable;
 import java.time.Duration;
-import java.time.LocalDateTime;
-import java.time.Period;
 import java.time.format.DateTimeFormatter;
 
 public class GameDTO implements Serializable {

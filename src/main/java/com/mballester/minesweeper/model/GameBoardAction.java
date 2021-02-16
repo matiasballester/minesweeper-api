@@ -98,7 +98,8 @@ public class GameBoardAction {
 
         if(board[rowIndex][columnIndex].getMinesNear() == 0
             && !board[rowIndex][columnIndex].isMined()
-                && !board[rowIndex][columnIndex].isRevealed()) {
+                && !board[rowIndex][columnIndex].containsFlagOrQuestionMark()
+                    && !board[rowIndex][columnIndex].isRevealed()) {
             board[rowIndex][columnIndex].setRevealed(true);
         }
     }

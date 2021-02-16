@@ -25,6 +25,10 @@ public class Cell implements Serializable {
         return revealed;
     }
 
+    public boolean containsFlagOrQuestionMark() {
+        return isFlagged() || isQuestionMark();
+    }
+
     public void setRevealed(boolean revealed) {
         this.revealed = revealed;
     }

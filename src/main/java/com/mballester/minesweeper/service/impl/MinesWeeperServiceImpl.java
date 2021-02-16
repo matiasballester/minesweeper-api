@@ -14,7 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -65,7 +65,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
         if(isAbleToPlay(gameBoardAction)) {
             if (gameBoardAction.isMined()) {
                 logger.debug("User " + game.getUser().getUserName() + " selected a mined cell. Game ended");
-                game.setEndTime(LocalDateTime.now());
+                game.setEndTime(ZonedDateTime.now().toLocalDateTime());
                 game.setState(States.LOST);
                 gameBoardAction.revealMines();
             } else {
@@ -73,7 +73,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
                 gameBoardAction.revealNeighbors();
                 if (gameBoardAction.checkWin()) {
                     logger.debug("User " + game.getUser().getUserName() + " win");
-                    game.setEndTime(LocalDateTime.now());
+                    game.setEndTime(ZonedDateTime.now().toLocalDateTime());
                     game.setState(States.VICTORY);
                     gameBoardAction.revealMines();
                 }

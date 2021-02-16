@@ -61,15 +61,26 @@ From here you can test the rest endpoint sending them in json format
 
 ## Important Notes
 
-API was created using RestController to handle rest api calls.
-Once the request is validated (user's input validation), a service is taking care of calling to the domain objects 
-to accomplish the game's logic. Once the game logic is ready it's persisted using a JPA crud repository:
+
+The API was created using spring RestController.
+Once the request is validated (spring-validation), the controller delegates the work to the service layer, that calls to the domain objects 
+to accomplish the game's logic. Once the game logic is ready it's persisted using a JPA crud repository and the persisted game is returned to the controller
+layer.
  
-- userName: user's identification
-- board: json that contains user's actions
-- state: game states (ACTICE, VICTORY, LOST)
-- startTime: when the game was started
-- endTime: when the game is finished (only win or loss)
+Schema:
+
+- Users
+    - user_id integer
+    - user_name varchar 
+    - password varchar
+    
+- Game
+    - game_id integer
+    - board json
+    - start_time date
+    - end_time date
+    - state varchar
+    - user_id integer    
 
 ## Features implemented
 

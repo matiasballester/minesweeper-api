@@ -62,7 +62,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
         GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionInput.getRow(), gameBoardActionInput.getColumn(), game.getBoard());
         logger.debug("User " + game.getUser().getUserName() + " selects cell [" + gameBoardActionInput.getRow() + "][" + gameBoardActionInput.getColumn() + "]");
 
-        if(!gameBoardAction.isFlagged() && !gameBoardAction.isQuestionMarked()) {
+        if(isAbleToPlay(gameBoardAction)) {
             if (gameBoardAction.isMined()) {
                 logger.debug("User " + game.getUser().getUserName() + " selected a mined cell. Game ended");
                 game.setEndTime(LocalDateTime.now());
@@ -78,9 +78,13 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
                     gameBoardAction.revealMines();
                 }
             }
+            gameRepository.save(game);
         }
-        gameRepository.save(game);
         return game;
+    }
+
+    private boolean isAbleToPlay(GameBoardAction gameBoardAction) {
+        return !gameBoardAction.isRevealed() && !gameBoardAction.isFlagged() && !gameBoardAction.isQuestionMarked();
     }
 
     @Override

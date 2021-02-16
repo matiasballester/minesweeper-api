@@ -96,7 +96,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     public Game questionMarkCell(GameBoardActionInput gameBoardActionInput) {
         Game game = gameRepository.findById(gameBoardActionInput.getGameId()).orElseThrow(() -> new GameNotFoundException());
         GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionInput.getRow(), gameBoardActionInput.getColumn(), game.getBoard());
-        gameBoardAction.questionMark();
+        gameBoardAction.questionMarkCell();
         gameRepository.save(game);
         return game;
     }

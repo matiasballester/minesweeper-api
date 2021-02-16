@@ -105,18 +105,22 @@ public class GameBoardAction {
 
     public void flagCell(){
         if(! isRevealed()) {
-            if (!isFlagged()) {
+            if (!isFlagged() || isQuestionMarked()) {
                 flag();
+                if(isQuestionMarked())
+                    removeQuestionMark();
             } else {
                 unFlag();
             }
         }
     }
 
-    public void addQuestionMark(){
+    public void questionMarkCell(){
         if(!isRevealed()) {
-            if(!isQuestionMarked()) {
+            if(!isQuestionMarked() || isFlagged()) {
                 questionMark();
+                if(isFlagged())
+                    unFlag();
             } else {
                 removeQuestionMark();
             }

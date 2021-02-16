@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,6 +23,8 @@ import java.util.stream.Collectors;
 public class MinesWeeperServiceImpl implements MinesWeeperService {
 
     private Logger logger = LoggerFactory.getLogger(MinesWeeperServiceImpl.class);
+
+    private static ZoneId ZONE_ID = ZoneId.of("America/Argentina/Buenos_Aires");
 
     @Autowired
     private GameRepository gameRepository;
@@ -65,7 +68,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
         if(isAbleToPlay(gameBoardAction)) {
             if (gameBoardAction.isMined()) {
                 logger.debug("User " + game.getUser().getUserName() + " selected a mined cell. Game ended");
-                game.setEndTime(ZonedDateTime.now().toLocalDateTime());
+                game.setEndTime(ZonedDateTime.now(ZONE_ID).toLocalDateTime());
                 game.setState(States.LOST);
                 gameBoardAction.revealMines();
             } else {
@@ -73,7 +76,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
                 gameBoardAction.revealNeighbors();
                 if (gameBoardAction.checkWin()) {
                     logger.debug("User " + game.getUser().getUserName() + " win");
-                    game.setEndTime(ZonedDateTime.now().toLocalDateTime());
+                    game.setEndTime(ZonedDateTime.now(ZONE_ID).toLocalDateTime());
                     game.setState(States.VICTORY);
                     gameBoardAction.revealMines();
                 }

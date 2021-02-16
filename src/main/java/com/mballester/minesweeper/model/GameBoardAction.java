@@ -19,12 +19,24 @@ public class GameBoardAction {
         return board[row][col].isFlagged();
     }
 
+    public boolean isQuestionMarked(){
+        return board[row][col].isQuestionMark();
+    }
+
     public void flag(){
         board[row][col].setFlagged(true);
     }
 
     public void unFlag(){
         board[row][col].setFlagged(false);
+    }
+
+    public void questionMark() {
+        board[row][col].setQuestionMark(true);
+    }
+
+    public void removeQuestionMark(){
+        board[row][col].setQuestionMark(false);
     }
 
     public void reveal(int rowIndex, int columnIndex){
@@ -97,6 +109,16 @@ public class GameBoardAction {
                 flag();
             } else {
                 unFlag();
+            }
+        }
+    }
+
+    public void addQuestionMark(){
+        if(!isRevealed()) {
+            if(!isQuestionMarked()) {
+                questionMark();
+            } else {
+                removeQuestionMark();
             }
         }
     }

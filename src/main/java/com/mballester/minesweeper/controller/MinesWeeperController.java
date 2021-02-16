@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
@@ -131,7 +132,22 @@ public class MinesWeeperController {
         try {
             return ResponseEntity.status(HttpStatus.OK).body(GameDTO.createGameDTO(minesweeperService.flagCell(gameBoardActionInput)));
         } catch (Exception e) {
-            logger.error("Failed to make a move", e);
+            logger.error("Failed to flag a cell", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
+        }
+    }
+
+    /**
+     * Adds a question mark
+     * @param gameBoardActionInput
+     * @return a DTO that contains the game with the updates
+     */
+    @PostMapping("/addQuestionMark")
+    public ResponseEntity addQuestionMark(@Valid @RequestBody GameBoardActionInput gameBoardActionInput) {
+        try {
+            return ResponseEntity.status(HttpStatus.OK).body(GameDTO.createGameDTO(minesweeperService.questionMarkCell(gameBoardActionInput)));
+        } catch (Exception e) {
+            logger.error("Failed to add a question mark", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Message(e.getMessage()));
         }
     }

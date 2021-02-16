@@ -25,18 +25,23 @@ This project exposes these rest endpoints:
 @GetMapping("/users/{id}"): returns the user by id
 
 @PostMapping("/startGame)[@RequestBody GameBoardInputRequest]: retrieves the game's configuration selected by the user
-* userName: user's identification
+* gameId: game id
 * rows: amount of rows used to create the board
 * columns: amount of columns used to create the board
 * mines: amount of mines to be loaded in the board
 
 @PostMapping("/playGame)[@RequestBody GameBoardActionInputRequest]: user can start playing the game by selecting or flagging a cell
-* userName: user's identification
+* gameId: game id
 * row: row component of the selected cell
 * column: column component of the selected cell
 
 @PostMapping("/addFlag)[@RequestBody GameBoardActionInputRequest]: user can flag a cell to think it twice. As a result of it the cell will be marked as flagged
-* userName: user's identification
+* gameId: game id
+* row: row component of the selected cell
+* column: column component of the selected cell
+
+@PostMapping("/addQuestionMark)[@RequestBody GameBoardActionInputRequest]: user can add a question mark to a cell to think it twice. As a result of it the cell will be marked as questionMarked
+* gameId: game id
 * row: row component of the selected cell
 * column: column component of the selected cell
 
@@ -86,6 +91,7 @@ Schema:
 
 - Ability to 'flag' a cell with a question mark or red flag
   - "/addFlag" endpoint allows to the user to 'flag' a cell with a red flag
+  - "/addQuestionMark" endpoint allows to the user to add a question mark to a cell
  
 - Detect when game is over
   - "/playGame" endpoint takes care of game's logic, resulting in 3 possible states for a started game: 

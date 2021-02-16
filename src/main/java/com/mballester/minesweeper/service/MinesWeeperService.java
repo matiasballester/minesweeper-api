@@ -18,6 +18,8 @@ public interface MinesWeeperService {
 
     Game flagCell(GameBoardActionInput gameBoardActionInput);
 
+    Game questionMarkCell(GameBoardActionInput gameBoardActionInput);
+
     List<Game> getGamesByUserAndStatus(Long userId, States states);
 
     List<Game> getAllGames();

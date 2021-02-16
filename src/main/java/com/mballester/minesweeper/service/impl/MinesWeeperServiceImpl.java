@@ -62,7 +62,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
         GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionInput.getRow(), gameBoardActionInput.getColumn(), game.getBoard());
         logger.debug("User " + game.getUser().getUserName() + " selects cell [" + gameBoardActionInput.getRow() + "][" + gameBoardActionInput.getColumn() + "]");
 
-        if(! gameBoardAction.isFlagged()) {
+        if(!gameBoardAction.isFlagged() && !gameBoardAction.isQuestionMarked()) {
             if (gameBoardAction.isMined()) {
                 logger.debug("User " + game.getUser().getUserName() + " selected a mined cell. Game ended");
                 game.setEndTime(LocalDateTime.now());
@@ -88,6 +88,15 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
         Game game = gameRepository.findById(gameBoardActionInput.getGameId()).orElseThrow(() -> new GameNotFoundException());
         GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionInput.getRow(), gameBoardActionInput.getColumn(), game.getBoard());
         gameBoardAction.flagCell();
+        gameRepository.save(game);
+        return game;
+    }
+
+    @Override
+    public Game questionMarkCell(GameBoardActionInput gameBoardActionInput) {
+        Game game = gameRepository.findById(gameBoardActionInput.getGameId()).orElseThrow(() -> new GameNotFoundException());
+        GameBoardAction gameBoardAction = new GameBoardAction(gameBoardActionInput.getRow(), gameBoardActionInput.getColumn(), game.getBoard());
+        gameBoardAction.questionMark();
         gameRepository.save(game);
         return game;
     }

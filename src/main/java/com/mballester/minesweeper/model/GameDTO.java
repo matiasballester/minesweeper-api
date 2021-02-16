@@ -147,15 +147,17 @@ public class GameDTO implements Serializable {
 
             Duration duration = Duration.between(game.getStartTime(), game.getEndTime());
             StringBuilder timeSpentBuilder = new StringBuilder();
-            if(duration.toDays() > 0)
-                timeSpentBuilder.append(duration.toDays() + " Days ");
-            if(duration.toHours() > 0)
-                timeSpentBuilder.append(duration.toHours() + " Hours ");
-            if(duration.toMinutes() > 0)
-                timeSpentBuilder.append(duration.toMinutes() + " Minutes ");
-            if(duration.getSeconds() > 0)
-                timeSpentBuilder.append(duration.getSeconds() + " Seconds ");
 
+            int hours = (int) Math.floor(duration.getSeconds() / 3600);
+            int minutes = (int) Math.floor(duration.getSeconds() % 3600 / 60);
+            int seconds = (int) Math.floor(duration.getSeconds() % 3600 % 60);
+
+            if(hours > 0)
+                timeSpentBuilder.append(hours > 0 ? hours + (hours == 1 ? " hour, " : " hours, ") : "");
+            if(minutes > 0)
+                timeSpentBuilder.append(minutes > 0 ? minutes + (minutes == 1 ? " minute, " : " minutes, ") : "");
+            if(seconds > 0)
+                timeSpentBuilder.append(seconds > 0 ? seconds + (seconds == 1 ? " second " : " seconds ") : "");
             gameDTO.setTimeSpent(timeSpentBuilder.toString());
         }
         return gameDTO;

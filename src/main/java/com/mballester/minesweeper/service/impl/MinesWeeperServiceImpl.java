@@ -122,14 +122,14 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
     @Override
     public User getAuthenticatedUser(UserInputRequest userInputRequest) {
         User user = userRepository.findByUserName(userInputRequest.getUserName());
-        if(user == null) throw new UserNotFoundException("User doesn't exists. Please register first");
+        if(user == null) throw new UserNotFoundException("User doesn't exist. Please register first");
         if(! passwordEncoder.matches(userInputRequest.getPassword(), user.getPassword())) throw new IllegalArgumentException("Username and/or password are not correct");
         return user;
     }
 
     @Override
     public User getUser(Long id) {
-        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User doesn't exists"));
+        return userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("User doesn't exist"));
     }
 
     private Cell[][] createCells(int rows, int cols) {

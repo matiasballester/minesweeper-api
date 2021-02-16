@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
@@ -48,6 +49,7 @@ public class MinesWeeperServiceImpl implements MinesWeeperService {
         gameBoard.loadNearMines();
 
         Game game = new Game(board, user);
+        game.setStartTime(ZonedDateTime.now(ZONE_ID).toLocalDateTime());
         game.setRows(gameBoardInput.getRows());
         game.setCols(gameBoardInput.getCols());
         game.setMines(gameBoardInput.getMines());

@@ -25,7 +25,7 @@ This project exposes these rest endpoints:
 @GetMapping("/users/{id}"): returns the user by id
 
 @PostMapping("/startGame)[@RequestBody GameBoardInputRequest]: retrieves the game's configuration selected by the user
-* gameId: game id
+* userId: user id
 * rows: amount of rows used to create the board
 * columns: amount of columns used to create the board
 * mines: amount of mines to be loaded in the board
